@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  dev:
+    image: golang:1.18-bullseye
+    volumes:
+      - ./:/go/src/github.com/l1pton17/lq
+    working_dir: /go/src/github.com/l1pton17/lq
+    command: make watch-test
