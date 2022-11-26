@@ -36,37 +36,8 @@ func (it zip2Iterator[T1, T2]) Range(f func(v Tuple2[T1, T2]) bool) {
 	ch2 := make(chan T2)
 	done := make(chan struct{})
 
-	go func() {
-		it.iterator1.Range(
-			func(v T1) bool {
-				select {
-				case ch1 <- v:
-				case <-done:
-					return false
-				}
-
-				return true
-			},
-		)
-
-		close(ch1)
-	}()
-
-	go func() {
-		it.iterator2.Range(
-			func(v T2) bool {
-				select {
-				case ch2 <- v:
-				case <-done:
-					return false
-				}
-
-				return true
-			},
-		)
-
-		close(ch2)
-	}()
+	go iterateIteratorToChannel(it.iterator1, ch1, done)
+	go iterateIteratorToChannel(it.iterator2, ch2, done)
 
 	for {
 		v1, ok := <-ch1

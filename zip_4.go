@@ -1,24 +1,27 @@
 package lq
 
-type zip3Iterator[T1, T2, T3 any] struct {
+type zip4Iterator[T1, T2, T3, T4 any] struct {
 	iterator1 Iterator[T1]
 	iterator2 Iterator[T2]
 	iterator3 Iterator[T3]
+	iterator4 Iterator[T4]
 }
 
-func Zip3[T1, T2, T3 any](
+func Zip4[T1, T2, T3, T4 any](
 	iterator1 Iterator[T1],
 	iterator2 Iterator[T2],
 	iterator3 Iterator[T3],
-) Iterator[Tuple3[T1, T2, T3]] {
-	return zip3Iterator[T1, T2, T3]{
+	iterator4 Iterator[T4],
+) Iterator[Tuple4[T1, T2, T3, T4]] {
+	return zip4Iterator[T1, T2, T3, T4]{
 		iterator1: iterator1,
 		iterator2: iterator2,
 		iterator3: iterator3,
+		iterator4: iterator4,
 	}
 }
 
-func (it zip3Iterator[T1, T2, T3]) Count() int {
+func (it zip4Iterator[T1, T2, T3, T4]) Count() int {
 	count := Max(
 		DefaultIfEmpty(
 			Where(
@@ -26,6 +29,7 @@ func (it zip3Iterator[T1, T2, T3]) Count() int {
 					tryEstimateCount(it.iterator1),
 					tryEstimateCount(it.iterator2),
 					tryEstimateCount(it.iterator3),
+					tryEstimateCount(it.iterator4),
 				),
 				func(v int) bool { return v > 0 },
 			),
@@ -35,15 +39,17 @@ func (it zip3Iterator[T1, T2, T3]) Count() int {
 	return count
 }
 
-func (it zip3Iterator[T1, T2, T3]) Range(f func(v Tuple3[T1, T2, T3]) bool) {
+func (it zip4Iterator[T1, T2, T3, T4]) Range(f func(v Tuple4[T1, T2, T3, T4]) bool) {
 	ch1 := make(chan T1)
 	ch2 := make(chan T2)
 	ch3 := make(chan T3)
+	ch4 := make(chan T4)
 	done := make(chan struct{})
 
 	go iterateIteratorToChannel(it.iterator1, ch1, done)
 	go iterateIteratorToChannel(it.iterator2, ch2, done)
 	go iterateIteratorToChannel(it.iterator3, ch3, done)
+	go iterateIteratorToChannel(it.iterator4, ch4, done)
 
 	for {
 		v1, ok := <-ch1
@@ -64,7 +70,13 @@ func (it zip3Iterator[T1, T2, T3]) Range(f func(v Tuple3[T1, T2, T3]) bool) {
 			return
 		}
 
-		if !f(NewTuple3(v1, v2, v3)) {
+		v4, ok := <-ch4
+		if !ok {
+			done <- struct{}{}
+			return
+		}
+
+		if !f(NewTuple4(v1, v2, v3, v4)) {
 			done <- struct{}{}
 			return
 		}

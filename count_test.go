@@ -35,9 +35,7 @@ func BenchmarkCount(b *testing.B) {
 				_ = len(
 					lo.Filter(
 						lo.RangeFrom(1, 1_000_000),
-						func(v int, i int) bool {
-							return v%2 == 0
-						},
+						func(v int, i int) bool { return v%2 == 0 },
 					),
 				)
 			}

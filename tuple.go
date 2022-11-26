@@ -41,6 +41,15 @@ type Tuple4[A any, B any, C any, D any] struct {
 	D D
 }
 
+func NewTuple4[A, B, C, D any](a A, b B, c C, d D) Tuple4[A, B, C, D] {
+	return Tuple4[A, B, C, D]{
+		A: a,
+		B: b,
+		C: c,
+		D: d,
+	}
+}
+
 func (t Tuple4[A, B, C, D]) Unpack() (A, B, C, D) {
 	return t.A, t.B, t.C, t.D
 }
