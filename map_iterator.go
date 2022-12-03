@@ -1,18 +1,18 @@
 package lq
 
-type MapIterator[TKey comparable, TValue any] struct {
-	value map[TKey]TValue
+type MapIterator[K comparable, V any] struct {
+	value map[K]V
 }
 
-func Map[TKey comparable, TValue any](value map[TKey]TValue) Iterator[MapEntry[TKey, TValue]] {
-	return MapIterator[TKey, TValue]{value: value}
+func Map[K comparable, V any](value map[K]V) Iterator[MapEntry[K, V]] {
+	return MapIterator[K, V]{value: value}
 }
 
-func (it MapIterator[TKey, TValue]) Count() int {
+func (it MapIterator[K, V]) Count() int {
 	return len(it.value)
 }
 
-func (it MapIterator[TKey, TValue]) Range(iterator func(entry MapEntry[TKey, TValue]) bool) {
+func (it MapIterator[K, V]) Range(iterator func(entry MapEntry[K, V]) bool) {
 	for k, v := range it.value {
 		if !iterator(NewMapEntry(k, v)) {
 			break

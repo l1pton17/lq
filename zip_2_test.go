@@ -17,9 +17,9 @@ func Test_Zip2(t *testing.T) {
 	require.Equal(
 		t,
 		[]Tuple2[int, int]{
-			NewTuple2(1, 5),
-			NewTuple2(2, 6),
-			NewTuple2(3, 7),
+			T2(1, 5),
+			T2(2, 6),
+			T2(3, 7),
 		},
 		actual,
 	)

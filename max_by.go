@@ -1,22 +1,25 @@
 package lq
 
-func MaxBy[TIn any, TOut Ordered](
+func MaxBy[TIn any, TOrderBy Ordered](
 	iterator Iterator[TIn],
-	selector func(v TIn) TOut,
-) TOut {
-	var max TOut
+	selector func(v TIn) TOrderBy,
+) TIn {
+	var maxValue TOrderBy
+	var maxElement TIn
 	var maxSet bool
 
 	iterator.Range(
 		func(value TIn) bool {
 			if !maxSet {
-				max = selector(value)
+				maxElement = value
+				maxValue = selector(value)
 				maxSet = true
 			} else {
-				v := selector(value)
+				orderer := selector(value)
 
-				if max < v {
-					max = v
+				if maxValue < orderer {
+					maxValue = orderer
+					maxElement = value
 				}
 			}
 
@@ -28,5 +31,5 @@ func MaxBy[TIn any, TOut Ordered](
 		panic("no elements found")
 	}
 
-	return max
+	return maxElement
 }

@@ -1,10 +1,10 @@
 package lq
 
 type orderBy[TValue any, TBy Ordered] struct {
-	selector func(value TValue) TBy
+	selector func(v TValue) TBy
 }
 
-func OrderBy[TValue any, TBy Ordered](selector func(value TValue) TBy) Orderer[TValue, TBy] {
+func OrderBy[TValue any, TBy Ordered](selector func(v TValue) TBy) Orderer[TValue, TBy] {
 	return orderBy[TValue, TBy]{
 		selector: selector,
 	}

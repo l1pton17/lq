@@ -1,22 +1,25 @@
 package lq
 
-func MinBy[TIn any, TOut Ordered](
+func MinBy[TIn any, TOrderKey Ordered](
 	iterator Iterator[TIn],
-	selector func(v TIn) TOut,
-) TOut {
-	var min TOut
+	selector func(v TIn) TOrderKey,
+) TIn {
+	var minValue TOrderKey
+	var minElement TIn
 	var minSet bool
 
 	iterator.Range(
 		func(value TIn) bool {
 			if !minSet {
-				min = selector(value)
+				minElement = value
+				minValue = selector(value)
 				minSet = true
 			} else {
-				v := selector(value)
+				orderKey := selector(value)
 
-				if min > v {
-					min = v
+				if minValue > orderKey {
+					minValue = orderKey
+					minElement = value
 				}
 			}
 
@@ -28,5 +31,5 @@ func MinBy[TIn any, TOut Ordered](
 		panic("no elements found")
 	}
 
-	return min
+	return minElement
 }

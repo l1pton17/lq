@@ -5,7 +5,7 @@ type Tuple2[A, B any] struct {
 	B B
 }
 
-func NewTuple2[A, B any](a A, b B) Tuple2[A, B] {
+func T2[A, B any](a A, b B) Tuple2[A, B] {
 	return Tuple2[A, B]{
 		A: a,
 		B: b,
@@ -22,7 +22,7 @@ type Tuple3[A any, B any, C any] struct {
 	C C
 }
 
-func NewTuple3[A, B, C any](a A, b B, c C) Tuple3[A, B, C] {
+func T3[A, B, C any](a A, b B, c C) Tuple3[A, B, C] {
 	return Tuple3[A, B, C]{
 		A: a,
 		B: b,
@@ -41,7 +41,7 @@ type Tuple4[A any, B any, C any, D any] struct {
 	D D
 }
 
-func NewTuple4[A, B, C, D any](a A, b B, c C, d D) Tuple4[A, B, C, D] {
+func T4[A, B, C, D any](a A, b B, c C, d D) Tuple4[A, B, C, D] {
 	return Tuple4[A, B, C, D]{
 		A: a,
 		B: b,
@@ -54,25 +54,46 @@ func (t Tuple4[A, B, C, D]) Unpack() (A, B, C, D) {
 	return t.A, t.B, t.C, t.D
 }
 
-type Tuple5[A any, B any, C any, D any, E any] struct {
+type Tuple5[A, B, C, D, E any] struct {
 	A A
 	B B
 	C C
 	D D
 	E E
+}
+
+func T5[A, B, C, D, E any](a A, b B, c C, d D, e E) Tuple5[A, B, C, D, E] {
+	return Tuple5[A, B, C, D, E]{
+		A: a,
+		B: b,
+		C: c,
+		D: d,
+		E: e,
+	}
 }
 
 func (t Tuple5[A, B, C, D, E]) Unpack() (A, B, C, D, E) {
 	return t.A, t.B, t.C, t.D, t.E
 }
 
-type Tuple6[A any, B any, C any, D any, E any, F any] struct {
+type Tuple6[A, B, C, D, E, F any] struct {
 	A A
 	B B
 	C C
 	D D
 	E E
 	F F
+}
+
+func T6[A, B, C, D, E, F any](a A, b B, c C, d D, e E, f F) Tuple6[A, B, C, D, E, F] {
+	return Tuple6[A, B, C, D, E, F]{
+		A: a,
+		B: b,
+		C: c,
+		D: d,
+		E: e,
+		F: f,
+	}
 }
 
 func (t Tuple6[A, B, C, D, E, F]) Unpack() (A, B, C, D, E, F) {

@@ -31,26 +31,10 @@ func Test_Order(t *testing.T) {
 	t.Run(
 		"should order by multiple times", func(t *testing.T) {
 			values := []MultiOrder{
-				{
-					A: 1,
-					B: 3,
-					C: 3,
-				},
-				{
-					A: 1,
-					B: 2,
-					C: 3,
-				},
-				{
-					A: 1,
-					B: 3,
-					C: 4,
-				},
-				{
-					A: 1,
-					B: 3,
-					C: 3,
-				},
+				{A: 1, B: 3, C: 3},
+				{A: 1, B: 2, C: 3},
+				{A: 1, B: 3, C: 4},
+				{A: 1, B: 3, C: 3},
 			}
 
 			actual := ToSlice(
@@ -65,26 +49,10 @@ func Test_Order(t *testing.T) {
 			require.Equal(
 				t,
 				[]MultiOrder{
-					{
-						A: 1,
-						B: 2,
-						C: 3,
-					},
-					{
-						A: 1,
-						B: 3,
-						C: 3,
-					},
-					{
-						A: 1,
-						B: 3,
-						C: 3,
-					},
-					{
-						A: 1,
-						B: 3,
-						C: 4,
-					},
+					{A: 1, B: 2, C: 3},
+					{A: 1, B: 3, C: 3},
+					{A: 1, B: 3, C: 3},
+					{A: 1, B: 3, C: 4},
 				},
 				actual,
 			)
@@ -94,26 +62,10 @@ func Test_Order(t *testing.T) {
 	t.Run(
 		"should order by descending multiple times", func(t *testing.T) {
 			values := []MultiOrder{
-				{
-					A: 1,
-					B: 3,
-					C: 3,
-				},
-				{
-					A: 1,
-					B: 2,
-					C: 3,
-				},
-				{
-					A: 1,
-					B: 3,
-					C: 4,
-				},
-				{
-					A: 1,
-					B: 3,
-					C: 3,
-				},
+				{A: 1, B: 3, C: 3},
+				{A: 1, B: 2, C: 3},
+				{A: 1, B: 3, C: 4},
+				{A: 1, B: 3, C: 3},
 			}
 
 			actual := ToSlice(
@@ -128,26 +80,10 @@ func Test_Order(t *testing.T) {
 			require.Equal(
 				t,
 				[]MultiOrder{
-					{
-						A: 1,
-						B: 3,
-						C: 4,
-					},
-					{
-						A: 1,
-						B: 3,
-						C: 3,
-					},
-					{
-						A: 1,
-						B: 3,
-						C: 3,
-					},
-					{
-						A: 1,
-						B: 2,
-						C: 3,
-					},
+					{A: 1, B: 3, C: 4},
+					{A: 1, B: 3, C: 3},
+					{A: 1, B: 3, C: 3},
+					{A: 1, B: 2, C: 3},
 				},
 				actual,
 			)

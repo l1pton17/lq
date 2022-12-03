@@ -31,9 +31,9 @@ func (it zip2Iterator[T1, T2]) Count() int {
 	return count
 }
 
-func (it zip2Iterator[T1, T2]) Range(f func(v Tuple2[T1, T2]) bool) {
-	ch1 := make(chan T1)
-	ch2 := make(chan T2)
+func (it zip2Iterator[TA, TB]) Range(f func(v Tuple2[TA, TB]) bool) {
+	ch1 := make(chan TA)
+	ch2 := make(chan TB)
 	done := make(chan struct{})
 
 	go iterateIteratorToChannel(it.iterator1, ch1, done)
@@ -52,7 +52,7 @@ func (it zip2Iterator[T1, T2]) Range(f func(v Tuple2[T1, T2]) bool) {
 			return
 		}
 
-		if !f(NewTuple2(v1, v2)) {
+		if !f(T2(v1, v2)) {
 			done <- struct{}{}
 			return
 		}
