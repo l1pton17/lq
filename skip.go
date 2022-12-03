@@ -22,11 +22,7 @@ func Skip[T any](
 			iterator.Range(
 				func(value T) bool {
 					if curCount > count {
-						if !f(value) {
-							return false
-						}
-
-						return true
+						return f(value)
 					}
 
 					curCount++

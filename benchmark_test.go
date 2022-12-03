@@ -2,6 +2,7 @@ package lq
 
 import (
 	"math/rand"
+	"runtime"
 	"strconv"
 	"testing"
 	"time"
@@ -64,6 +65,8 @@ func BenchmarkSlice(b *testing.B) {
 						results = append(results, result)
 					}
 				}
+
+				runtime.KeepAlive(results)
 			}
 		},
 	)

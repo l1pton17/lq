@@ -23,11 +23,7 @@ func SelectMany[TIn, TOut any](
 						},
 					)
 
-					if stopped {
-						return false
-					}
-
-					return true
+					return !stopped
 				},
 			)
 		},

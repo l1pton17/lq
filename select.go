@@ -9,13 +9,7 @@ func Select[TIn, TOut any](
 		rangeFn: func(f Iteratee[TOut]) {
 			iterator.Range(
 				func(value TIn) bool {
-					outValue := selector(value)
-
-					if !f(outValue) {
-						return false
-					}
-
-					return true
+					return f(selector(value))
 				},
 			)
 		},
