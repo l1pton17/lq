@@ -12,6 +12,13 @@ type Iterator[T any] struct {
 	cheapCountFn func() int
 }
 
+func NewIterator[T any](rangeFn func(f Iteratee[T]), cheapCountFn func() int) Iterator[T] {
+	return Iterator[T]{
+		rangeFn:      rangeFn,
+		cheapCountFn: cheapCountFn,
+	}
+}
+
 func (it Iterator[T]) Range(f Iteratee[T]) {
 	it.rangeFn(f)
 }
