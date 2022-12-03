@@ -18,6 +18,8 @@ func Test_Range(t *testing.T) {
 	t.Run(
 		"should stop iterate if false returned", func(t *testing.T) {
 			actual := ToSlice(Where(Range(10, 10), func(v int) bool { return v <= 11 }))
+
+			require.Equal(t, []int{10, 11}, actual)
 		},
 	)
 }
