@@ -1,40 +1,31 @@
 package lq
 
-type selectManyIterator[TIn, TOut any] struct {
-	iterator Iterator[TIn]
-	selector func(value TIn) Iterator[TOut]
-}
-
 func SelectMany[TIn, TOut any](
 	iterator Iterator[TIn],
-	selector func(value TIn) Iterator[TOut],
+	selector func(v TIn) Iterator[TOut],
 ) Iterator[TOut] {
-	return selectManyIterator[TIn, TOut]{
-		iterator: iterator,
-		selector: selector,
-	}
-}
+	return Iterator[TOut]{
+		cheapCountFn: func() int {
+			return iterator.CheapCount()
+		},
+		rangeFn: func(f Iteratee[TOut]) {
+			stopped := false
 
-func (it selectManyIterator[TIn, TOut]) Range(f func(value TOut) bool) {
-	stopped := false
+			iterator.Range(
+				func(v TIn) bool {
+					selector(v).Range(
+						func(ov TOut) bool {
+							if !f(ov) {
+								stopped = true
+								return false
+							}
+							return true
+						},
+					)
 
-	it.iterator.Range(
-		func(v TIn) bool {
-			it.selector(v).Range(
-				func(ov TOut) bool {
-					if !f(ov) {
-						stopped = true
-						return false
-					}
-					return true
+					return !stopped
 				},
 			)
-			
-			if stopped {
-				return false
-			}
-
-			return true
 		},
-	)
+	}
 }

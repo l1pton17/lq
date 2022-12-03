@@ -18,7 +18,7 @@ func Test_MapIterator_Count(t *testing.T) {
 				},
 			)
 
-			actual := tryEstimateCount(subject)
+			actual := subject.CheapCount()
 
 			require.Equal(t, 2, actual)
 		},

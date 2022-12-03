@@ -2,6 +2,7 @@ package lq
 
 import (
 	"math/rand"
+	"runtime"
 	"strconv"
 	"testing"
 	"time"
@@ -28,15 +29,10 @@ func BenchmarkSlice(b *testing.B) {
 		"lq.Map", func(b *testing.B) {
 			b.ReportAllocs()
 			for n := 0; n < b.N; n++ {
-				_ = ToSlice(
-					Where(
-						Where(
-							Select(Slice(arr), func(v int64) string { return strconv.FormatInt(v, 10) }),
-							func(v string) bool { return len(v) < 1000 },
-						),
-						func(v string) bool { return len(v) > 1 },
-					),
-				)
+				_ = Select(Slice(arr), func(v int64) string { return strconv.FormatInt(v, 10) }).
+					Where(func(v string) bool { return len(v) < 1000 }).
+					Where(func(v string) bool { return len(v) > 1 }).
+					ToSlice()
 			}
 		},
 	)
@@ -69,6 +65,8 @@ func BenchmarkSlice(b *testing.B) {
 						results = append(results, result)
 					}
 				}
+
+				runtime.KeepAlive(results)
 			}
 		},
 	)

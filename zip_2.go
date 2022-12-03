@@ -1,60 +1,45 @@
 package lq
 
-type zip2Iterator[T1, T2 any] struct {
-	iterator1 Iterator[T1]
-	iterator2 Iterator[T2]
-}
+func Zip2[TA, TB any](
+	iterator1 Iterator[TA],
+	iterator2 Iterator[TB],
+) Iterator[Tuple2[TA, TB]] {
+	return Iterator[Tuple2[TA, TB]]{
+		cheapCountFn: func() int {
+			count := Max(
+				Values(iterator1.CheapCount(), iterator2.CheapCount()).
+					Where(func(v int) bool { return v > 0 }).
+					DefaultIfEmpty(),
+			)
 
-func Zip2[T1, T2 any](
-	iterator1 Iterator[T1],
-	iterator2 Iterator[T2],
-) Iterator[Tuple2[T1, T2]] {
-	return zip2Iterator[T1, T2]{
-		iterator1: iterator1,
-		iterator2: iterator2,
-	}
-}
+			return count
+		},
+		rangeFn: func(f Iteratee[Tuple2[TA, TB]]) {
+			ch1 := make(chan TA)
+			ch2 := make(chan TB)
+			done := make(chan struct{})
 
-func (it zip2Iterator[T1, T2]) Count() int {
-	count := Max(
-		DefaultIfEmpty(
-			Where(
-				Values(
-					tryEstimateCount(it.iterator1),
-					tryEstimateCount(it.iterator2),
-				),
-				func(v int) bool { return v > 0 },
-			),
-		),
-	)
+			go iterateIteratorToChannel(iterator1, ch1, done)
+			go iterateIteratorToChannel(iterator2, ch2, done)
 
-	return count
-}
+			for {
+				v1, ok := <-ch1
+				if !ok {
+					done <- struct{}{}
+					return
+				}
 
-func (it zip2Iterator[TA, TB]) Range(f func(v Tuple2[TA, TB]) bool) {
-	ch1 := make(chan TA)
-	ch2 := make(chan TB)
-	done := make(chan struct{})
+				v2, ok := <-ch2
+				if !ok {
+					done <- struct{}{}
+					return
+				}
 
-	go iterateIteratorToChannel(it.iterator1, ch1, done)
-	go iterateIteratorToChannel(it.iterator2, ch2, done)
-
-	for {
-		v1, ok := <-ch1
-		if !ok {
-			done <- struct{}{}
-			return
-		}
-
-		v2, ok := <-ch2
-		if !ok {
-			done <- struct{}{}
-			return
-		}
-
-		if !f(T2(v1, v2)) {
-			done <- struct{}{}
-			return
-		}
+				if !f(T2(v1, v2)) {
+					done <- struct{}{}
+					return
+				}
+			}
+		},
 	}
 }

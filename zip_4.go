@@ -1,84 +1,63 @@
 package lq
 
-type zip4Iterator[T1, T2, T3, T4 any] struct {
-	iterator1 Iterator[T1]
-	iterator2 Iterator[T2]
-	iterator3 Iterator[T3]
-	iterator4 Iterator[T4]
-}
+func Zip4[TA, TB, TC, TD any](
+	iterator1 Iterator[TA],
+	iterator2 Iterator[TB],
+	iterator3 Iterator[TC],
+	iterator4 Iterator[TD],
+) Iterator[Tuple4[TA, TB, TC, TD]] {
+	return Iterator[Tuple4[TA, TB, TC, TD]]{
+		cheapCountFn: func() int {
+			count := Max(
+				Values(iterator1.CheapCount(), iterator2.CheapCount(), iterator3.CheapCount(), iterator4.CheapCount()).
+					Where(func(v int) bool { return v > 0 }).
+					DefaultIfEmpty(),
+			)
 
-func Zip4[T1, T2, T3, T4 any](
-	iterator1 Iterator[T1],
-	iterator2 Iterator[T2],
-	iterator3 Iterator[T3],
-	iterator4 Iterator[T4],
-) Iterator[Tuple4[T1, T2, T3, T4]] {
-	return zip4Iterator[T1, T2, T3, T4]{
-		iterator1: iterator1,
-		iterator2: iterator2,
-		iterator3: iterator3,
-		iterator4: iterator4,
-	}
-}
+			return count
+		},
+		rangeFn: func(f Iteratee[Tuple4[TA, TB, TC, TD]]) {
+			ch1 := make(chan TA)
+			ch2 := make(chan TB)
+			ch3 := make(chan TC)
+			ch4 := make(chan TD)
+			done := make(chan struct{})
 
-func (it zip4Iterator[T1, T2, T3, T4]) Count() int {
-	count := Max(
-		DefaultIfEmpty(
-			Where(
-				Values(
-					tryEstimateCount(it.iterator1),
-					tryEstimateCount(it.iterator2),
-					tryEstimateCount(it.iterator3),
-					tryEstimateCount(it.iterator4),
-				),
-				func(v int) bool { return v > 0 },
-			),
-		),
-	)
+			go iterateIteratorToChannel(iterator1, ch1, done)
+			go iterateIteratorToChannel(iterator2, ch2, done)
+			go iterateIteratorToChannel(iterator3, ch3, done)
+			go iterateIteratorToChannel(iterator4, ch4, done)
 
-	return count
-}
+			for {
+				v1, ok := <-ch1
+				if !ok {
+					done <- struct{}{}
+					return
+				}
 
-func (it zip4Iterator[TA, TB, TC, TD]) Range(f func(v Tuple4[TA, TB, TC, TD]) bool) {
-	ch1 := make(chan TA)
-	ch2 := make(chan TB)
-	ch3 := make(chan TC)
-	ch4 := make(chan TD)
-	done := make(chan struct{})
+				v2, ok := <-ch2
+				if !ok {
+					done <- struct{}{}
+					return
+				}
 
-	go iterateIteratorToChannel(it.iterator1, ch1, done)
-	go iterateIteratorToChannel(it.iterator2, ch2, done)
-	go iterateIteratorToChannel(it.iterator3, ch3, done)
-	go iterateIteratorToChannel(it.iterator4, ch4, done)
+				v3, ok := <-ch3
+				if !ok {
+					done <- struct{}{}
+					return
+				}
 
-	for {
-		v1, ok := <-ch1
-		if !ok {
-			done <- struct{}{}
-			return
-		}
+				v4, ok := <-ch4
+				if !ok {
+					done <- struct{}{}
+					return
+				}
 
-		v2, ok := <-ch2
-		if !ok {
-			done <- struct{}{}
-			return
-		}
-
-		v3, ok := <-ch3
-		if !ok {
-			done <- struct{}{}
-			return
-		}
-
-		v4, ok := <-ch4
-		if !ok {
-			done <- struct{}{}
-			return
-		}
-
-		if !f(T4(v1, v2, v3, v4)) {
-			done <- struct{}{}
-			return
-		}
+				if !f(T4(v1, v2, v3, v4)) {
+					done <- struct{}{}
+					return
+				}
+			}
+		},
 	}
 }

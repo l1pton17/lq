@@ -1,31 +1,26 @@
 package lq
 
-type distinctIterator[T comparable] struct {
-	iterator Iterator[T]
-}
-
 func Distinct[T comparable](
 	iterator Iterator[T],
 ) Iterator[T] {
-	return distinctIterator[T]{
-		iterator: iterator,
-	}
-}
+	return Iterator[T]{
+		cheapCountFn: unknownCountFn,
+		rangeFn: func(f Iteratee[T]) {
+			visited := make(map[T]struct{})
 
-func (it distinctIterator[T]) Range(f func(value T) bool) {
-	visited := make(map[T]struct{})
+			iterator.Range(
+				func(value T) bool {
+					if _, exists := visited[value]; !exists {
+						if !f(value) {
+							return false
+						}
 
-	it.iterator.Range(
-		func(value T) bool {
-			if _, exists := visited[value]; !exists {
-				if !f(value) {
-					return false
-				}
+						visited[value] = struct{}{}
+					}
 
-				visited[value] = struct{}{}
-			}
-
-			return true
+					return true
+				},
+			)
 		},
-	)
+	}
 }

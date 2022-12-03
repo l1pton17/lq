@@ -1,41 +1,32 @@
 package lq
 
-type GroupByEntry[TKey comparable, TValue any] struct {
-	Key    TKey
-	Values []TValue
+type GroupByEntry[K comparable, V any] struct {
+	Key    K
+	Values []V
 }
 
-type groupByIterator[TKey comparable, TValue any] struct {
-	iterator    Iterator[TValue]
-	keySelector func(value TValue) TKey
-}
+func GroupBy[K comparable, V any](
+	iterator Iterator[V],
+	keySelector func(v V) K,
+) Iterator[GroupByEntry[K, V]] {
+	return Iterator[GroupByEntry[K, V]]{
+		cheapCountFn: unknownCountFn,
+		rangeFn: func(f Iteratee[GroupByEntry[K, V]]) {
+			groups := make(map[K][]V)
 
-func GroupBy[TValue any, TKey comparable](
-	iterator Iterator[TValue],
-	keySelector func(value TValue) TKey,
-) Iterator[GroupByEntry[TKey, TValue]] {
-	return groupByIterator[TKey, TValue]{
-		iterator:    iterator,
-		keySelector: keySelector,
-	}
-}
+			iterator.Range(
+				func(value V) bool {
+					key := keySelector(value)
+					groups[key] = append(groups[key], value)
+					return true
+				},
+			)
 
-func (g groupByIterator[TKey, TValue]) Range(
-	f func(value GroupByEntry[TKey, TValue]) bool,
-) {
-	groups := make(map[TKey][]TValue)
-
-	g.iterator.Range(
-		func(value TValue) bool {
-			key := g.keySelector(value)
-			groups[key] = append(groups[key], value)
-			return true
+			for key, values := range groups {
+				if !f(GroupByEntry[K, V]{Key: key, Values: values}) {
+					return
+				}
+			}
 		},
-	)
-
-	for key, values := range groups {
-		if !f(GroupByEntry[TKey, TValue]{Key: key, Values: values}) {
-			return
-		}
 	}
 }
