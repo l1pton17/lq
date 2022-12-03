@@ -14,11 +14,8 @@ func Where[T any](
 			iterator.Range(
 				func(v T) bool {
 					if predicate(v) {
-						if !f(v) {
-							return false
-						}
+						return f(v)
 					}
-
 					return true
 				},
 			)

@@ -11,10 +11,10 @@ func Take[T any](
 	return Iterator[T]{
 		cheapCountFn: func() int {
 			itCount := iterator.CheapCount()
-
 			if itCount < count {
 				return itCount
 			}
+
 			return count
 		},
 		rangeFn: func(f Iteratee[T]) {
@@ -23,13 +23,9 @@ func Take[T any](
 			iterator.Range(
 				func(value T) bool {
 					if curCount < count {
-						if !f(value) {
-							return false
-						}
-
 						curCount++
 
-						return true
+						return f(value)
 					}
 
 					return false
