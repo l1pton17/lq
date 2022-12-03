@@ -1,45 +1,40 @@
 package lq
 
-type takeIterator[T any] struct {
-	iterator Iterator[T]
-	count    int
+func (it Iterator[T]) Take(count int) Iterator[T] {
+	return Take(it, count)
 }
 
 func Take[T any](
 	iterator Iterator[T],
 	count int,
 ) Iterator[T] {
-	return takeIterator[T]{
-		iterator: iterator,
-		count:    count,
-	}
-}
+	return Iterator[T]{
+		cheapCountFn: func() int {
+			itCount := iterator.CheapCount()
 
-func (it takeIterator[T]) Count() int {
-	itCount := tryEstimateCount(it.iterator)
-
-	if itCount < it.count {
-		return itCount
-	}
-	return it.count
-}
-
-func (it takeIterator[T]) Range(f func(value T) bool) {
-	count := 0
-
-	it.iterator.Range(
-		func(value T) bool {
-			if count < it.count {
-				if !f(value) {
-					return false
-				}
-
-				count++
-
-				return true
+			if itCount < count {
+				return itCount
 			}
-
-			return false
+			return count
 		},
-	)
+		rangeFn: func(f Iteratee[T]) {
+			curCount := 0
+
+			iterator.Range(
+				func(value T) bool {
+					if curCount < count {
+						if !f(value) {
+							return false
+						}
+
+						curCount++
+
+						return true
+					}
+
+					return false
+				},
+			)
+		},
+	}
 }

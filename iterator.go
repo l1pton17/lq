@@ -1,17 +1,21 @@
 package lq
 
-type Iterator[T any] interface {
-	Range(func(v T) bool)
+const UnknownCount = 0
+
+var unknownCountFn = func() int { return UnknownCount }
+var zeroCountFn = func() int { return 0 }
+
+type Iteratee[T any] func(v T) bool
+
+type Iterator[T any] struct {
+	rangeFn      func(f Iteratee[T])
+	cheapCountFn func() int
 }
 
-type countedIterator[T any] interface {
-	Count() int
+func (it Iterator[T]) Range(f Iteratee[T]) {
+	it.rangeFn(f)
 }
 
-func tryEstimateCount[T any](iterator Iterator[T]) int {
-	if ci, ok := iterator.(countedIterator[T]); ok {
-		return ci.Count()
-	}
-
-	return 0
+func (it Iterator[T]) CheapCount() int {
+	return it.cheapCountFn()
 }

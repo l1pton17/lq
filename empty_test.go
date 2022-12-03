@@ -9,7 +9,7 @@ import (
 func Test_Empty(t *testing.T) {
 	t.Run(
 		"should return zero count", func(t *testing.T) {
-			actual := tryEstimateCount(Empty[int]())
+			actual := Empty[int]().CheapCount()
 
 			require.Equal(t, 0, actual)
 		},

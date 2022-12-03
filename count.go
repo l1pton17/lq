@@ -1,12 +1,11 @@
 package lq
 
-type counterIterator[T any] struct {
-	iterator Iterator[T]
+func (it Iterator[T]) Count() int {
+	return Count(it)
 }
 
 func Count[T any](iterator Iterator[T]) int {
-	estimatedCount := tryEstimateCount(iterator)
-
+	estimatedCount := iterator.CheapCount()
 	if estimatedCount != 0 {
 		return estimatedCount
 	}

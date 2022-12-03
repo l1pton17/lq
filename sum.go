@@ -1,9 +1,5 @@
 package lq
 
-type sumIterator[T Math] struct {
-	iterator Iterator[T]
-}
-
 func Sum[T Math](iterator Iterator[T]) T {
 	var sum T
 

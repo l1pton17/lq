@@ -1,49 +1,46 @@
 package lq
 
-type defaultIfEmptyIterator[T any] struct {
-	iterator     Iterator[T]
-	defaultValue T
+func (it Iterator[T]) DefaultIfEmpty() Iterator[T] {
+	return DefaultIfEmpty(it)
+}
+
+func (it Iterator[T]) DefaultIfEmptyV(defaultValue T) Iterator[T] {
+	return DefaultIfEmptyV(it, defaultValue)
 }
 
 func DefaultIfEmpty[T any](
 	iterator Iterator[T],
 ) Iterator[T] {
-	return defaultIfEmptyIterator[T]{
-		iterator: iterator,
-	}
+	var defaultValue T
+	return DefaultIfEmptyV(iterator, defaultValue)
 }
 
 func DefaultIfEmptyV[T any](
 	iterator Iterator[T],
 	defaultValue T,
 ) Iterator[T] {
-	return defaultIfEmptyIterator[T]{
-		iterator:     iterator,
-		defaultValue: defaultValue,
-	}
-}
+	return Iterator[T]{
+		cheapCountFn: func() int {
+			count := iterator.CheapCount()
+			if count == 0 {
+				return 1
+			}
 
-func (it defaultIfEmptyIterator[T]) Count() int {
-	count := tryEstimateCount(it.iterator)
-
-	if count == 0 {
-		return 1
-	}
-
-	return count
-}
-
-func (it defaultIfEmptyIterator[T]) Range(f func(v T) bool) {
-	hasValue := false
-
-	it.iterator.Range(
-		func(v T) bool {
-			hasValue = true
-			return f(v)
+			return count
 		},
-	)
+		rangeFn: func(f Iteratee[T]) {
+			hasValue := false
 
-	if !hasValue {
-		f(it.defaultValue)
+			iterator.Range(
+				func(v T) bool {
+					hasValue = true
+					return f(v)
+				},
+			)
+
+			if !hasValue {
+				f(defaultValue)
+			}
+		},
 	}
 }
