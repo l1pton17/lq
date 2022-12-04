@@ -4,7 +4,7 @@ type orderBy[TValue any, TBy Ordered] struct {
 	selector func(v TValue) TBy
 }
 
-func OrderBy[TValue any, TBy Ordered](selector func(v TValue) TBy) Orderer[TValue, TBy] {
+func OrderBy[TValue any, TBy Ordered](selector func(v TValue) TBy) Orderer[TValue] {
 	return orderBy[TValue, TBy]{
 		selector: selector,
 	}

@@ -13,16 +13,9 @@ func Test_Order(t *testing.T) {
 
 	t.Run(
 		"should order", func(t *testing.T) {
-			actual := ToSlice(
-				Order(
-					Slice([]int{3, 9, 2}),
-					OrderBy(
-						func(value int) int {
-							return value
-						},
-					),
-				),
-			)
+			actual := Slice([]int{3, 9, 2}).
+				Order(OrderBy(func(value int) int { return value })).
+				ToSlice()
 
 			require.Equal(t, []int{2, 3, 9}, actual)
 		},
@@ -37,14 +30,12 @@ func Test_Order(t *testing.T) {
 				{A: 1, B: 3, C: 3},
 			}
 
-			actual := ToSlice(
+			actual := Slice(values).
 				Order(
-					Slice(values),
 					OrderBy(func(value MultiOrder) int { return value.A }),
 					OrderBy(func(value MultiOrder) int { return value.B }),
 					OrderBy(func(value MultiOrder) int { return value.C }),
-				),
-			)
+				).ToSlice()
 
 			require.Equal(
 				t,
@@ -68,14 +59,12 @@ func Test_Order(t *testing.T) {
 				{A: 1, B: 3, C: 3},
 			}
 
-			actual := ToSlice(
+			actual := Slice(values).
 				Order(
-					Slice(values),
-					OrderByDescending(func(value MultiOrder) int { return value.A }),
-					OrderByDescending(func(value MultiOrder) int { return value.B }),
-					OrderByDescending(func(value MultiOrder) int { return value.C }),
-				),
-			)
+					OrderByDesc(func(value MultiOrder) int { return value.A }),
+					OrderByDesc(func(value MultiOrder) int { return value.B }),
+					OrderByDesc(func(value MultiOrder) int { return value.C }),
+				).ToSlice()
 
 			require.Equal(
 				t,

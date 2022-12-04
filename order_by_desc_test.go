@@ -11,7 +11,7 @@ func Test_OrderByDescending_Compare(t *testing.T) {
 
 	t.Run(
 		"should return 0 if values equal", func(t *testing.T) {
-			subject := OrderByDescending(func(v int) int { return -1 * v })
+			subject := OrderByDesc(func(v int) int { return -1 * v })
 
 			actual := subject.Compare(1, 1)
 
@@ -21,7 +21,7 @@ func Test_OrderByDescending_Compare(t *testing.T) {
 
 	t.Run(
 		"should return -1 if value a greater than b", func(t *testing.T) {
-			subject := OrderByDescending(func(v int) int { return v })
+			subject := OrderByDesc(func(v int) int { return v })
 
 			actual := subject.Compare(2, 1)
 
@@ -31,7 +31,7 @@ func Test_OrderByDescending_Compare(t *testing.T) {
 
 	t.Run(
 		"should return 1 if value a less than b", func(t *testing.T) {
-			subject := OrderByDescending(func(v int) int { return v })
+			subject := OrderByDesc(func(v int) int { return v })
 
 			actual := subject.Compare(0, 1)
 

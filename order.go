@@ -2,18 +2,25 @@ package lq
 
 import "sort"
 
-type Orderer[TValue any, TBy Ordered] interface {
+type Orderer[TValue any] interface {
 	Compare(a, b TValue) int
 }
 
-func Order[TValue any, TBy Ordered](
-	iterator Iterator[TValue],
-	order1 Orderer[TValue, TBy],
-	orderers ...Orderer[TValue, TBy],
-) Iterator[TValue] {
-	return Iterator[TValue]{
+func (it Iterator[T]) Order(
+	order1 Orderer[T],
+	orderers ...Orderer[T],
+) Iterator[T] {
+	return Order(it, order1, orderers...)
+}
+
+func Order[T any](
+	iterator Iterator[T],
+	order1 Orderer[T],
+	orderers ...Orderer[T],
+) Iterator[T] {
+	return Iterator[T]{
 		cheapCountFn: iterator.cheapCountFn,
-		rangeFn: func(f Iteratee[TValue]) {
+		rangeFn: func(f Iteratee[T]) {
 			values := ToSlice(iterator)
 
 			sort.Slice(
